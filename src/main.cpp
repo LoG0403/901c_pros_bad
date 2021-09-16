@@ -24,8 +24,7 @@ void on_center_button() {
  */
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
+	pros::lcd::set_text(1, "Hello Nadir!");
 	pros::lcd::register_btn1_cb(on_center_button);
 }
 
@@ -75,18 +74,44 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
+	//prog bot motor port mappings 09/13/21
+	pros::Motor bot_left_mtr(5);
+	pros::Motor top_left_mtr(19);
+	pros::Motor bot_right_mtr(17);
+	pros::Motor top_right_mtr(15);
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
+		float left = master.get_analog(ANALOG_LEFT_Y);
+		float right = master.get_analog(ANALOG_RIGHT_Y);
 
-		left_mtr = left;
-		right_mtr = right;
+		float analogL = pros::E_CONTROLLER_ANALOG_LEFT_Y;
+
+		float negativeL = 0.0-left;
+		float negativeR = 0.0-right;
+
 		pros::delay(20);
+
+
+
+		while(left > 0 or left < 0){
+//pros::E_CONTROLLER_ANALOG_LEFT_Y != left
+/*
+PROG BOT Y-AXIS MOVEMENT ON Y JOYSTICK
+		pros::c::motor_move(5,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(19,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(17,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(15,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		*/
+		//negatives fucky wucky require joystick to go in reverse
+		//left side FUBAR
+		pros::c::motor_move(-1,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(9,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(-10,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(-12,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+    pros::delay(2);
+		}
 	}
 }
