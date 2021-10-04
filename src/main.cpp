@@ -26,7 +26,12 @@ void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello Nadir!");
 	pros::lcd::register_btn1_cb(on_center_button);
+
+	#define DIGITAL_SENSOR_PORT 'B';
+
+  pros::ADIDigitalOut piston ('B');
 }
+
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -74,47 +79,45 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	//prog bot motor port mappings 09/13/21
-	//real bot motor ports 5/19/17/15
-	pros::Motor bot_left_mtr(5);
-	pros::Motor top_left_mtr(9);
-	pros::Motor bot_right_mtr(13);
-	pros::Motor top_right_mtr(21);
+
+	pros::Motor bot_left_mtr(2);
+	pros::Motor top_left_mtr(1);
+	pros::Motor bot_right_mtr(9);
+	pros::Motor top_right_mtr(10);
+	pros::Motor left_lift(11);
+	pros::Motor right_lift(3);
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
+
 		float left = master.get_analog(ANALOG_LEFT_Y);
 		float right = master.get_analog(ANALOG_RIGHT_Y);
 
-		float analogL = pros::E_CONTROLLER_ANALOG_LEFT_Y;
+		//pros::E_CONTROLLER_ANALOG_LEFT_Y != master.get_analog(ANALOG_LEFT_Y)
 
 		float negativeL = 0.0-left;
 		float negativeR = 0.0-right;
 
+		int BLmtrVal;
+		int TLmtrVal;
+		int BRmtrVal;
+		int TRmtrVal;
+
 		pros::delay(20);
 
-
+		//NADIRS NOTE 2 (Oct, 4, 2021) back/forward bindings on controller are fucky, lift is working sort of jerky, turning not functional
 
 		while(left > 0 or left < 0){
-//pros::E_CONTROLLER_ANALOG_LEFT_Y != left
-
-//PROG BOT Y-AXIS MOVEMENT ON Y JOYSTICK
-		//pros::c::motor_move(5,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(19,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(17,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		//pros::c::motor_move(15,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-
-		//negatives fucky wucky require joystick to move backwards in reverse
-		//left side FUBAR
 		/*
-		pros::c::motor_move(-1,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(9,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(-10,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(-12,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
     pros::delay(2);
 		*/
+		//NADIRS NOTE 1 (Sept 16, 2021): turning XXmtrVal negative will result in backwards movement
 		}
 	}
 }
