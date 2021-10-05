@@ -24,7 +24,7 @@ void on_center_button() {
  */
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello Nadir!");
+	pros::lcd::set_text(1, "Stay Schemin!");
 	pros::lcd::register_btn1_cb(on_center_button);
 
 	#define DIGITAL_SENSOR_PORT 'B';
@@ -80,10 +80,16 @@ void autonomous() {}
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-	pros::Motor bot_left_mtr(2);
-	pros::Motor top_left_mtr(1);
-	pros::Motor bot_right_mtr(9);
-	pros::Motor top_right_mtr(10);
+	int BLmtrVal = 2;
+	int TLmtrVal = 1;
+	int BRmtrVal = 9;
+	int TRmtrVal = 10;
+
+	pros::Motor bot_left_mtr(BLmtrVal);
+	pros::Motor top_left_mtr(TLmtrVal);
+	pros::Motor bot_right_mtr(BRmtrVal);
+	pros::Motor top_right_mtr(TRmtrVal);
+
 	pros::Motor left_lift(11);
 	pros::Motor right_lift(3);
 
@@ -100,24 +106,26 @@ void opcontrol() {
 		float negativeL = 0.0-left;
 		float negativeR = 0.0-right;
 
-		int BLmtrVal;
-		int TLmtrVal;
-		int BRmtrVal;
-		int TRmtrVal;
-
+		while(right > 0 or right < 0){
 		pros::delay(20);
-
-		//NADIRS NOTE 2 (Oct, 4, 2021) back/forward bindings on controller are fucky, lift is working sort of jerky, turning not functional
+		pros::c::motor_move(-BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+		pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+		pros::c::motor_move(-BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+		pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+    pros::delay(2);
+		}
 
 		while(left > 0 or left < 0){
-		/*
-		pros::c::motor_move(BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::delay(20);
+		pros::c::motor_move(-BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(-TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
 		pros::c::motor_move(BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
 		pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
     pros::delay(2);
-		*/
-		//NADIRS NOTE 1 (Sept 16, 2021): turning XXmtrVal negative will result in backwards movement
 		}
+
+		//CONTROLLER BEHAVIOR FUCKY: left stick still jams, and the program only works with one stick at a time, but donuts are functional
+		//Pneumatics are declared but not set up
+
 	}
 }
