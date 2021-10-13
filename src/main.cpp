@@ -1,5 +1,7 @@
 #include "main.h"
 
+//Tommybot, extinguisher of light, hope, and batteries
+
 /**
  * A callback function for LLEMU's center button.
  *
@@ -24,7 +26,7 @@ void on_center_button() {
  */
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Stay Schemin!");
+	pros::lcd::set_text(1, "--++ -+-+");
 	pros::lcd::register_btn1_cb(on_center_button);
 
 	#define DIGITAL_SENSOR_PORT 'B';
@@ -103,10 +105,7 @@ void opcontrol() {
 
 		//pros::E_CONTROLLER_ANALOG_LEFT_Y != master.get_analog(ANALOG_LEFT_Y)
 
-		float negativeL = 0.0-left;
-		float negativeR = 0.0-right;
-
-		while(right > 0 or right < 0){
+		if(right > 0 or right < 0){
 		pros::delay(20);
 		pros::c::motor_move(-BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 		pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
@@ -114,18 +113,40 @@ void opcontrol() {
 		pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
     pros::delay(2);
 		}
-
-		while(left > 0 or left < 0){
+/*
+		if(left > 0 or left < 0){
 		pros::delay(20);
-		pros::c::motor_move(-BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(-TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		pros::c::motor_move(BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		//pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		//pros::c::motor_move(BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_));
+		//pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
     pros::delay(2);
 		}
+*/
+		if(left > 0){
+			  pros::c::motor_move_voltage(BRmtrVal, -12000);
+  			pros::c::delay(2);
+				//pros::c::motor_move_voltage(BRmtrVal, 0);
 
-		//CONTROLLER BEHAVIOR FUCKY: left stick still jams, and the program only works with one stick at a time, but donuts are functional
+				pros::c::motor_move_voltage(BLmtrVal, 12000);
+  			pros::c::delay(2);
+				//pros::c::motor_move_voltage(BLmtrVal, 0);
+
+				if(left == 0){
+					pros::c::motor_move_voltage(BRmtrVal, 0);
+					pros::c::motor_move_voltage(BLmtrVal, 0);
+				}
+		}
+
+		/*
+		CONTROLLER BEHAVIOR FUCKY REPORT:
+		- starts going forward if left > 0, then doesn't stop
+		- donuts are fully functional and controller is able to take input from
+		both sticks simultaneously in this format
+		- right stick input is based on up/down, despite moving left/right and not
+		actually based on left/right stick movement
+		 */
+
 		//Pneumatics are declared but not set up
-
 	}
 }
