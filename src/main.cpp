@@ -101,16 +101,19 @@ void opcontrol() {
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
 
 		float left = master.get_analog(ANALOG_LEFT_Y);
-		float right = master.get_analog(ANALOG_RIGHT_Y);
+		float right = master.get_analog(ANALOG_RIGHT_X);
+
+		int rmMax = 0;
+		int fmMax = 0;
 
 		//pros::E_CONTROLLER_ANALOG_LEFT_Y != master.get_analog(ANALOG_LEFT_Y)
 
 		if(right > 0 or right < 0){
 		pros::delay(20);
-		pros::c::motor_move(-BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
-		pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
-		pros::c::motor_move(-BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
-		pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+		//pros::c::motor_move(-BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_X));
+		pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_X));
+		//pros::c::motor_move(-BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_X));
+		pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_X));
     pros::delay(2);
 		}
 /*
@@ -124,29 +127,45 @@ void opcontrol() {
 		}
 */
 		if(left > 0){
-			  pros::c::motor_move_voltage(BRmtrVal, -12000);
+			  if(rmMax == 0 && fmMax == 0){
+					rmMax = -12000;
+					fmMax = 12000;
+				pros::c::motor_move_voltage(BRmtrVal, rmMax);
   			pros::c::delay(2);
 				//pros::c::motor_move_voltage(BRmtrVal, 0);
 
-				pros::c::motor_move_voltage(BLmtrVal, 12000);
+				pros::c::motor_move_voltage(BLmtrVal, fmMax);
   			pros::c::delay(2);
 				//pros::c::motor_move_voltage(BLmtrVal, 0);
+			}
+			}
+			else if (left < 0){
+				rmMax = 12000;
+				fmMax = -12000;
 
-				if(left == 0){
-					pros::c::motor_move_voltage(BRmtrVal, 0);
-					pros::c::motor_move_voltage(BLmtrVal, 0);
+				pros::c::motor_move_voltage(BRmtrVal, rmMax);
+  			pros::c::delay(2);
+				//pros::c::motor_move_voltage(BRmtrVal, 0);
+
+				pros::c::motor_move_voltage(BLmtrVal, fmMax);
+  			pros::c::delay(2);
+			}
+			else{
+				rmMax = 0;
+				fmMax = 0;
+				pros::c::motor_move_voltage(BRmtrVal, rmMax);
+				pros::c::motor_move_voltage(BLmtrVal, fmMax);
 				}
 		}
 
+
+
+
+}
 		/*
 		CONTROLLER BEHAVIOR FUCKY REPORT:
-		- starts going forward if left > 0, then doesn't stop
-		- donuts are fully functional and controller is able to take input from
-		both sticks simultaneously in this format
-		- right stick input is based on up/down, despite moving left/right and not
-		actually based on left/right stick movement
+		- Forward/backwards/stopping/turning fully functional (but current iteration is untested)
+		- TEST TEST TEST
 		 */
 
 		//Pneumatics are declared but not set up
-	}
-}
