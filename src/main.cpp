@@ -26,7 +26,7 @@ void on_center_button() {
  */
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "--++ -+-+");
+	pros::lcd::set_text(1, "thanks for nothing");
 	pros::lcd::register_btn1_cb(on_center_button);
 
 	#define DIGITAL_SENSOR_PORT 'B';
@@ -85,7 +85,7 @@ void opcontrol() {
 	int BLmtrVal = 2;
 	int TLmtrVal = 1;
 	int BRmtrVal = 9;
-	int TRmtrVal = 10;
+	int TRmtrVal = 7; //9 on main bot
 
 	pros::Motor bot_left_mtr(BLmtrVal);
 	pros::Motor top_left_mtr(TLmtrVal);
@@ -94,6 +94,9 @@ void opcontrol() {
 
 	pros::Motor left_lift(11);
 	pros::Motor right_lift(3);
+
+	int LL = 11;
+	int RL = 3;
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
@@ -106,26 +109,52 @@ void opcontrol() {
 		int rmMax = 0;
 		int fmMax = 0;
 
-		//pros::E_CONTROLLER_ANALOG_LEFT_Y != master.get_analog(ANALOG_LEFT_Y)
+		int YrmMax = 0;
+		int YfmMax = 0;
 
-		if(right > 0 or right < 0){
-		pros::delay(20);
-		//pros::c::motor_move(-BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_X));
-		pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_X));
-		//pros::c::motor_move(-BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_X));
-		pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_RIGHT_X));
-    pros::delay(2);
+		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A) == 1){
+			pros::c::motor_move_voltage(LL, -12000);
+			pros::c::motor_move_voltage(RL, 12000);
 		}
-/*
-		if(left > 0 or left < 0){
-		pros::delay(20);
-		pros::c::motor_move(BLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		//pros::c::motor_move(TLmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-		//pros::c::motor_move(BRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_));
-		//pros::c::motor_move(TRmtrVal,pros::c::controller_get_analog(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-    pros::delay(2);
+		else if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B) == 1){
+			pros::c::motor_move_voltage(LL, 6000);
+			pros::c::motor_move_voltage(RL, -6000);
 		}
-*/
+
+		if(right>0){
+			if(YrmMax == 0 && YfmMax == 0){
+					YrmMax = -12000;
+					YfmMax = 12000;
+				pros::c::motor_move_voltage(TLmtrVal, YrmMax);
+				pros::c::motor_move_voltage(BLmtrVal, YrmMax);
+  			pros::c::delay(2);
+
+				pros::c::motor_move_voltage(BRmtrVal, YfmMax);
+				pros::c::motor_move_voltage(TRmtrVal, YfmMax);
+  			pros::c::delay(2);
+		}
+	}
+	else if (right < 0){
+		YrmMax = 12000;
+		YfmMax = -12000;
+
+		pros::c::motor_move_voltage(TLmtrVal, YrmMax);
+		pros::c::motor_move_voltage(BLmtrVal, YrmMax);
+		pros::c::delay(2);
+
+		pros::c::motor_move_voltage(BRmtrVal, YfmMax);
+		pros::c::motor_move_voltage(TRmtrVal, YfmMax);
+		pros::c::delay(2);
+	}
+	else{
+		YrmMax = 0;
+		YfmMax = 0;
+		pros::c::motor_move_voltage(TLmtrVal, YrmMax);
+		pros::c::motor_move_voltage(BLmtrVal, YrmMax);
+		pros::c::motor_move_voltage(BRmtrVal, YfmMax);
+		pros::c::motor_move_voltage(TRmtrVal, YfmMax);
+		}
+// ***************************************************************************
 		if(left > 0){
 			  if(rmMax == 0 && fmMax == 0){
 					rmMax = -12000;
@@ -138,7 +167,7 @@ void opcontrol() {
   			pros::c::delay(2);
 				//pros::c::motor_move_voltage(BLmtrVal, 0);
 			}
-			}
+		}
 			else if (left < 0){
 				rmMax = 12000;
 				fmMax = -12000;
