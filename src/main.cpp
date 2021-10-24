@@ -1,4 +1,5 @@
 #include "main.h"
+#include "config.hpp"
 
 //Tommybot, extinguisher of light, hope, and batteries
 
@@ -20,7 +21,6 @@ void on_center_button() {
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
- *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
@@ -28,9 +28,6 @@ void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Thank you Nadir!");
 	pros::lcd::register_btn1_cb(on_center_button);
-
-	#define DIGITAL_SENSOR_PORT 'A';
-	#define DIGITAL_SENSOR_PORT 'B';
 
 	pros::ADIDigitalOut piston1 ('A');
 //Piston 2 bound to the same DIGITAL_SENSOR_PORT
@@ -89,17 +86,6 @@ void opcontrol() {
 	int TLmtrVal = 1;
 	int BRmtrVal = 9;
 	int TRmtrVal = 8;
-
-	pros::Motor bot_left_mtr(BLmtrVal);
-	pros::Motor top_left_mtr(TLmtrVal);
-	pros::Motor bot_right_mtr(BRmtrVal);
-	pros::Motor top_right_mtr(TRmtrVal);
-
-	pros::Motor left_lift(11);
-	pros::Motor right_lift(3);
-	pros::Motor left_lift2(15);
-	pros::Motor right_lift2(16);
-
 
 	int LL = 18;
 	int RL = 17;
@@ -226,10 +212,3 @@ pros::ADIDigitalOut piston2 ('A');
 				}
 		}
 }
-		/*
-		CONTROLLER BEHAVIOR FUCKY REPORT:
-		- Forward/backwards/stopping/turning fully functional (but current iteration is untested)
-		- TEST TEST TEST
-		 */
-
-		//Pneumatics are declared but not set up
