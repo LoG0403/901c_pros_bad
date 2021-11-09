@@ -25,14 +25,14 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
+	/*pros::lcd::initialize();
 	pros::lcd::set_text(1, "Thank you Nadir!");
 	pros::lcd::register_btn1_cb(on_center_button);
 
-	pros::ADIDigitalOut piston1 ('A');
-//Piston 2 bound to the same DIGITAL_SENSOR_PORT
-	pros::ADIDigitalOut piston2 ('B');
-}
+	#define DIGITAL_SENSOR_PORT1 DSP1;
+	#define DIGITAL_SENSOR_PORT2 DSP2;
+*/
+	}
 
 
 /**
@@ -80,17 +80,6 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-
-	int BLmtrVal = 2;
-	int TLmtrVal = 1;
-	int BRmtrVal = 9;
-	int TRmtrVal = 8;
-
-	int LL = 18;
-	int RL = 17;
-	int RL2 = 11;
-	int LL2 = 14;
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
@@ -98,117 +87,106 @@ void opcontrol() {
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
 
 		float left = master.get_analog(ANALOG_LEFT_Y);
-		float right = master.get_analog(ANALOG_RIGHT_X);
-
-		int rmMax = 0;
-		int fmMax = 0;
-
-		int YrmMax = 0;
-		int YfmMax = 0;
-//EXPERIMENTAL
-
-pros::ADIDigitalOut piston1 ('A');
-//Piston 2 bound to the same DIGITAL_SENSOR_PORT
-pros::ADIDigitalOut piston2 ('A');
-
-//EXPERIMENTAL
+    float right = master.get_analog(ANALOG_RIGHT_X);
 
 		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A) == 1){
-			pros::c::motor_move_voltage(LL, -12000);
-			pros::c::motor_move_voltage(LL2, -12000);
-			pros::c::motor_move_voltage(RL, 12000);
-			pros::c::motor_move_voltage(RL2, 12000);
+			pros::c::motor_move_voltage(BLLP, -12000);
+			pros::c::motor_move_voltage(TLLP, -12000);
+			pros::c::motor_move_voltage(BRLP, 12000);
+			pros::c::motor_move_voltage(TRLP, 12000);
 		}
 		else if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B) == 1){
-			pros::c::motor_move_voltage(LL, 3000);
-			pros::c::motor_move_voltage(LL2, 3000);
-			pros::c::motor_move_voltage(RL, -3000);
-			pros::c::motor_move_voltage(RL2, -3000);
+			pros::c::motor_move_voltage(BLLP, 3000);
+			pros::c::motor_move_voltage(TLLP, 3000);
+			pros::c::motor_move_voltage(BRLP, -3000);
+			pros::c::motor_move_voltage(TRLP, -3000);
 		}
+
 //EXPERIMENTAL
 		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y) == 1){
 			piston1.set_value(true);
 			piston2.set_value(true);
+			pros::lcd::set_text(1, "I was pressed!");
+
 		}
 		else if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X) == 1){
 			piston1.set_value(false);
 			piston2.set_value(false);
 		}
+
 //EXPERIMENTAL
 
 		if(right > 0){
-			if(YrmMax == 0 && YfmMax == 0){
+			//if(YrmMax == 0 && YfmMax == 0){
 				YrmMax = 12000;
 				YfmMax = -12000;
-				pros::c::motor_move_voltage(TRmtrVal, -YrmMax);
-				pros::c::motor_move_voltage(TLmtrVal, YfmMax);
+				pros::c::motor_move_voltage(TRMP, -YrmMax);
+				pros::c::motor_move_voltage(TLMP, YfmMax);
 				pros::c::delay(2);
 
-				pros::c::motor_move_voltage(BRmtrVal, YrmMax);
-				pros::c::motor_move_voltage(BLmtrVal, -YfmMax);
+				pros::c::motor_move_voltage(BRMP, YrmMax);
+				pros::c::motor_move_voltage(BLMP, -YfmMax);
 				pros::c::delay(2);
-				}
+				//}
 		}
 
 		else if (right < 0){
 			YrmMax = 12000;
 			YfmMax = -12000;
 
-		pros::c::motor_move_voltage(TLmtrVal, YrmMax);
-		pros::c::motor_move_voltage(BLmtrVal, -YrmMax);
+		pros::c::motor_move_voltage(TLMP, YrmMax);
+		pros::c::motor_move_voltage(BLMP, -YrmMax);
 		pros::c::delay(2);
 
-		pros::c::motor_move_voltage(BRmtrVal, YfmMax);
-		pros::c::motor_move_voltage(TRmtrVal, -YfmMax);
+		pros::c::motor_move_voltage(BRMP, YfmMax);
+		pros::c::motor_move_voltage(TRMP, -YfmMax);
 		pros::c::delay(2);
 		}
 
 		else if(right == 0){
 			YrmMax = 0;
 			YfmMax = 0;
-		pros::c::motor_move_voltage(TLmtrVal, YrmMax);
-		pros::c::motor_move_voltage(BLmtrVal, YrmMax);
-		pros::c::motor_move_voltage(BRmtrVal, YfmMax);
-		pros::c::motor_move_voltage(TRmtrVal, YfmMax);
+		pros::c::motor_move_voltage(TLMP, YrmMax);
+		pros::c::motor_move_voltage(BLMP, YrmMax);
+		pros::c::motor_move_voltage(BRMP, YfmMax);
+		pros::c::motor_move_voltage(TRMP, YfmMax);
 		}
-//EXPERIMENTAL
 
-// ***************************************************************************
 		if(left < 0){
-			  if(rmMax == 0 && fmMax == 0){
+			  //if(rmMax == 0 && fmMax == 0){
 					rmMax = 12000;
 					fmMax = -12000;
 
-				pros::c::motor_move_voltage(TRmtrVal, -rmMax);
-				pros::c::motor_move_voltage(TLmtrVal, -fmMax);
+				pros::c::motor_move_voltage(TRMP, -rmMax);
+				pros::c::motor_move_voltage(TLMP, -fmMax);
   			pros::c::delay(2);
 
-				pros::c::motor_move_voltage(BRmtrVal, rmMax);
-				pros::c::motor_move_voltage(BLmtrVal, fmMax);
+				pros::c::motor_move_voltage(BRMP, rmMax);
+				pros::c::motor_move_voltage(BLMP, fmMax);
   			pros::c::delay(2);
-			}
+			//}
 		}
 			else if (left > 0){
 				rmMax = 12000;
 				fmMax = 12000;
 
-				pros::c::motor_move_voltage(TRmtrVal, rmMax);
-				pros::c::motor_move_voltage(TLmtrVal, -fmMax);
+				pros::c::motor_move_voltage(TRMP, rmMax);
+				pros::c::motor_move_voltage(TLMP, -fmMax);
   			pros::c::delay(2);
-				//pros::c::motor_move_voltage(BRmtrVal, 0);
+				//pros::c::motor_move_voltage(BRMP, 0);
 
-				pros::c::motor_move_voltage(BRmtrVal, -rmMax);
-				pros::c::motor_move_voltage(BLmtrVal, fmMax);
+				pros::c::motor_move_voltage(BRMP, -rmMax);
+				pros::c::motor_move_voltage(BLMP, fmMax);
 				pros::c::delay(2);
 			}
 
 			else if (left == 0){
 				rmMax = 0;
 				fmMax = 0;
-				pros::c::motor_move_voltage(TRmtrVal, rmMax);
-				pros::c::motor_move_voltage(TLmtrVal, fmMax);
-				pros::c::motor_move_voltage(BRmtrVal, rmMax);
-				pros::c::motor_move_voltage(BLmtrVal, fmMax);
+				pros::c::motor_move_voltage(TRMP, rmMax);
+				pros::c::motor_move_voltage(TLMP, fmMax);
+				pros::c::motor_move_voltage(BRMP, rmMax);
+				pros::c::motor_move_voltage(BLMP, fmMax);
 				}
 		}
 }
